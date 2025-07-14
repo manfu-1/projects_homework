@@ -1,7 +1,9 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-public class ArrayDeque<T> implements Deque<T> {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
     private T[] items;
     private int head;
@@ -102,10 +104,57 @@ public class ArrayDeque<T> implements Deque<T> {
         return list;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(o instanceof Deque)) return false;
+        Deque<?> other = (Deque<?>) o;
+        if (this.size() != other.size()) return false;
+        
+        Iterator<T> thisIter = this.iterator();
+        Iterator<?> otherIter = ((Iterable<T>) other).iterator();
+        while (thisIter.hasNext()) {
+            T item1 = thisIter.next();
+            Object item2 = otherIter.next();
+            if (!Objects.equals(item1, item2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
+    }
+    
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int curr;
+
+        public ArrayDequeIterator() {
+            curr = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curr < size;
+        }
+
+        @Override
+        public T next() {
+            return get(curr++);
+        }
+    }
+    
     public static void main(String[] args) {
         ArrayDeque<Integer> ad = new ArrayDeque<>();
         ad.addFirst(1);
         ad.addLast(2);
+        Iterator<Integer> seer = ad.iterator();
+        while (seer.hasNext()) {
+            System.out.println(seer.next()); 
+        }
         System.out.println(ad.toList()); // [1, 2]
         System.out.println(ad.removeFirst()); // 1
         System.out.println(ad.removeLast()); // 2
